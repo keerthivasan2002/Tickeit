@@ -1,128 +1,182 @@
 import axios from "axios";
 import { ProjectBrief, MeetingNote, Task, Role } from "../models/interfaces";
 
-// In a real app, this would be your API endpoint
-const API_URL = "https://your-backend-api.com/ai";
+// Configuration
+const GEMINI_API_KEY = "AIzaSyCbop97JqeAtmaQzIVzANnoZDrOMhhexQc";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent";
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
 
-export async function generateTasksFromContext(
-  projectBrief: ProjectBrief,
-  meetingNotes: MeetingNote[],
-  existingTasks: Task[]
-): Promise<Task[]> {
-  try {
-    // In a hackathon, you might mock this response for demo purposes
-    // This is where you'd normally call your Gemini API
-
-    // For demo purposes, let's return mock data
-    return mockGenerateTasks(
-      projectBrief,
-      meetingNotes[meetingNotes.length - 1]
-    );
-
-    // In production:
-    // const response = await axios.post(`${API_URL}/generate-tasks`, {
-    //   projectBrief,
-    //   meetingNotes,
-    //   existingTasks
-    // });
-    // return response.data;
-  } catch (error) {
-    console.error("Error generating tasks:", error);
-    return [];
-  }
+// Custom error class
+class GeminiAPIError extends Error {
+constructor(message: string, public statusCode?: number, public response?: any) {
+super(message);
+this.name = "GeminiAPIError";
+}
 }
 
-// Mock function for demo purposes
-function mockGenerateTasks(
-  projectBrief: ProjectBrief,
-  latestMeeting?: MeetingNote
-): Task[] {
-  const roles = projectBrief.teamMembers.map((member) => member.role);
-  const techStack = projectBrief.techStack;
+// Helper function to make API calls with retry logic
+async function callGeminiAPI(payload: any, retries = 0): Promise<any> {
+try {
+const response = await axios.post(
+`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
+payload
+);
+return response.data;
+} catch (error: any) {
+if (axios.isAxiosError(error) && error.response) {
+// Handle rate limiting
+if (error.response.status === 429 && retries < MAX_RETRIES) {
+console.warn(`Rate limited. Retrying in ${RETRY_DELAY_MS}ms...`);
+await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * (retries + 1)));
+return callGeminiAPI(payload, retries + 1);
+}
 
-  const mockTasks: Task[] = [];
+throw new GeminiAPIError(
+`Gemini API error: ${error.response.data.error?.message || 'Unknown error'}`,
+error.response.status,
+error.response.data
+);
+}
+throw new GeminiAPIError(`Network error: ${error.message}`);
+}
+}
 
-  // Generate tasks for frontend
-  if (roles.includes("frontend")) {
-    mockTasks.push({
-      id: `task-${Date.now()}-1`,
-      title: "Create login form",
-      description: `Implement a login form using ${
-        techStack.includes("React") ? "React hooks" : "the frontend framework"
-      } with email and password fields`,
-      assignedRole: "frontend",
-      status: "todo",
-      priority: "high",
-      createdAt: new Date(),
-    });
-  }
+export async function generateTasksFromContext(
+projectBrief: ProjectBrief,
+meetingNotes: MeetingNote[],
+existingTasks: Task[]
+): Promise<Task[]> {
+try {
+// Prepare the context for the Gemini API
+const prompt = `
+Based on the following project brief, meeting notes, and existing tasks, generate a list of new tasks that need to be completed.
 
-  // Generate tasks for backend
-  if (roles.includes("backend")) {
-    mockTasks.push({
-      id: `task-${Date.now()}-2`,
-      title: "Set up authentication routes",
-      description: `Create authentication endpoints using ${
-        techStack.includes("Firebase")
-          ? "Firebase Authentication"
-          : "your backend stack"
-      }`,
-      assignedRole: "backend",
-      status: "todo",
-      priority: "high",
-      createdAt: new Date(),
-    });
-  }
+PROJECT BRIEF:
+${JSON.stringify(projectBrief, null, 2)}
 
-  // Generate tasks for PM
-  if (roles.includes("pm")) {
-    mockTasks.push({
-      id: `task-${Date.now()}-3`,
-      title: "Create sprint plan",
-      description: "Organize tasks into a 1-week sprint and assign priorities",
-      assignedRole: "pm",
-      status: "todo",
-      priority: "medium",
-      createdAt: new Date(),
-    });
-  }
+MEETING NOTES:
+${JSON.stringify(meetingNotes, null, 2)}
 
-  // Generate tasks for AI engineer
-  if (roles.includes("ai")) {
-    mockTasks.push({
-      id: `task-${Date.now()}-4`,
-      title: "Set up Gemini API integration",
-      description:
-        "Create a service to handle Gemini API calls for task generation",
-      assignedRole: "ai",
-      status: "todo",
-      priority: "high",
-      createdAt: new Date(),
-    });
-  }
+EXISTING TASKS:
+${JSON.stringify(existingTasks, null, 2)}
 
-  return mockTasks;
+Please return a JSON array of tasks with the following structure:
+[
+{
+"id": "unique-id",
+"title": "Task title",
+"description": "Detailed description",
+"assignedRole": "One of: ${projectBrief.teamMembers.map(member => member.role).join(', ')}",
+"status": "todo",
+"priority": "One of: high, medium, low",
+"createdAt": "ISO date string"
+}
+]
+`;
+
+const payload = {
+contents: [
+{
+parts: [
+{ text: prompt }
+]
+}
+],
+generationConfig: {
+temperature: 0.2,
+responseMimeType: "application/json",
+responseSchema: {
+type: "ARRAY",
+items: {
+type: "OBJECT",
+properties: {
+id: { type: "STRING" },
+title: { type: "STRING" },
+description: { type: "STRING" },
+assignedRole: { type: "STRING" },
+status: { type: "STRING" },
+priority: { type: "STRING" },
+createdAt: { type: "STRING" }
+},
+required: ["title", "description", "assignedRole", "status", "priority"]
+}
+}
+}
+};
+
+const data = await callGeminiAPI(payload);
+
+// Parse the response
+const generatedTasks = JSON.parse(data.candidates[0].content.parts[0].text);
+
+// Ensure each task has a valid ID and createdAt timestamp
+return generatedTasks.map((task: any) => ({
+...task,
+id: task.id || `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+createdAt: task.createdAt ? new Date(task.createdAt) : new Date()
+}));
+} catch (error) {
+console.error("Error generating tasks:", error);
+if (error instanceof GeminiAPIError) {
+// Log specific API errors
+console.error(`API Error (${error.statusCode}):`, error.response);
+}
+return [];
+}
 }
 
 export async function getAIStandupResponse(
-  role: Role,
-  projectBrief: ProjectBrief,
-  tasks: Task[],
-  meetingNotes: MeetingNote[]
+role: Role,
+projectBrief: ProjectBrief,
+tasks: Task[],
+meetingNotes: MeetingNote[]
 ): Promise<string> {
-  // Mock response for demo
-  const roleTasks = tasks.filter(
-    (task) => task.assignedRole === role && task.status === "todo"
-  );
+try {
+const roleTasks = tasks.filter(task => task.assignedRole === role);
 
-  return `Based on your role as a ${role} developer and the recent meeting notes, 
-  here are your priorities for today:
-  
-  1. ${roleTasks[0]?.title || "Review the project requirements"}
-  2. ${roleTasks[1]?.title || "Coordinate with team members"}
-  
-  I recommend focusing on ${
-    roleTasks[0]?.title || "understanding the project scope"
-  } first 
-  as it will unblock other team members.`;
+const prompt = `
+You are an AI assistant helping with a software development project.
+
+PROJECT BRIEF:
+${JSON.stringify(projectBrief, null, 2)}
+
+TASKS ASSIGNED TO ${role.toUpperCase()} ROLE:
+${JSON.stringify(roleTasks, null, 2)}
+
+RECENT MEETING NOTES:
+${JSON.stringify(meetingNotes.slice(-2), null, 2)}
+
+Based on the above information, provide a concise standup response for a ${role} that includes:
+1. What they should focus on today
+2. Which tasks are highest priority
+3. Any potential blockers they should be aware of
+4. Any team dependencies they should know about
+
+Keep the response under 200 words and make it actionable.
+`;
+
+const payload = {
+contents: [
+{
+parts: [
+{ text: prompt }
+]
+}
+],
+generationConfig: {
+temperature: 0.3,
+maxOutputTokens: 300
+}
+};
+
+const data = await callGeminiAPI(payload);
+return data.candidates[0].content.parts[0].text;
+} catch (error) {
+console.error("Error generating standup response:", error);
+if (error instanceof GeminiAPIError) {
+console.error(`API Error (${error.statusCode}):`, error.response);
+}
+return `Unable to generate standup response. Please check your tasks and try again.`;
+}
 }

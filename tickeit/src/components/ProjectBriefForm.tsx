@@ -24,13 +24,26 @@ const availableTechStacks = [
   "Kubernetes"
 ];
 
-const roleOptions = [
+
+const roleOptions: { value: Role; label: Role }[] = [
   { value: "frontend", label: "frontend" },
   { value: "backend", label: "backend" },
-  { value: "ai", label: "ai" },
-  { value: "pm", label: "pm" },
-  { value: "designer", label: "designer" },
 ];
+
+
+const techOptions = availableTechStacks.map((tech) => ({
+  value: tech,
+  label: tech
+}));
+
+type Role = "frontend" | "backend" 
+
+interface TeamMember {
+  id: string;
+  name: string;
+  role: Role;
+}
+
 
 
 const techOptions = availableTechStacks.map((tech) => ({
@@ -44,7 +57,7 @@ const ProjectBriefForm: React.FC = () => {
   const [description, setDescription] = useState("");
   const [techStack, setTechStack] = useState<any[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { id: "member-1", name: "", role: "" },
+    { id: "member-1", name: "", role: "frontend" as Role },
   ]);
   const [goals, setGoals] = useState("");
 
@@ -81,7 +94,7 @@ const ProjectBriefForm: React.FC = () => {
   const addTeamMember = () => {
     setTeamMembers([
       ...teamMembers,
-      { id: `member-${teamMembers.length + 1}`, name: "", role: "" },
+      { id: `member-${teamMembers.length + 1}`, name: "", role: "frontend" as Role },
     ]);
   };
 
@@ -129,62 +142,64 @@ const ProjectBriefForm: React.FC = () => {
           />
         </div>
 
-        {/* Team Member Inputs */}
-        <div className="mb-4">
-          <label htmlFor="teamMembers" className="block text-sm font-medium">Add Team Members (Name and Role)</label>
-          <div className="space-y-20">
-            {/* Loop through the team members */}
-            {teamMembers.map((member, index) => (
-              <div key={index} className="flex space-y-6 mb-6"> {/* Added margin-bottom to each row */}
-                {/* Name Input */}
-                <input
-                  type="text"
-                  placeholder={`Enter Name ${index + 1}`}
-                  value={member.name}
-                  onChange={(e) => handleTeamMemberChange(index, "name", e.target.value)}
-                  className="p-3 border border-gray-300 space-y-6 rounded-md w-full"
-                />
-                {/* Role Dropdown */}
-                <Select
-                  value={{ value: member.role, label: member.role }}
-                  onChange={(selectedOption) => handleTeamMemberChange(index, "role", selectedOption?.value || "")}
-                  options={roleOptions}  // 🚨 Potential issue here!
-                  className="w-40 space-y-6"
-                />
-              </div>
-            ))}
-          </div>
-          {/* Add Team Member Button */}
-          <button
-            type= "button"
-            onClick={addTeamMember}
-            className= "btn-primary"
-          >
-            Add Team Member
-          </button>
-        </div>
 
-        {/* Project Goals */}
-        <div className="form-group">
-          <label htmlFor="goals" className="block text-sm font-medium">Project Goals (one per line)</label>
-          <textarea
-            id="goals"
-            value={goals}
-            onChange={(e) => setGoals(e.target.value)}
-            placeholder="Create a functional MVP 
+{/* Team Member Inputs */}
+<div className="mb-4">
+  <label htmlFor="teamMembers" className="block text-sm font-medium">Add Team Members (Name and Role)</label>
+  <div className="space-y-20">
+    {/* Loop through the team members */}
+    {teamMembers.map((member, index) => (
+      <div key={index} className="flex space-y-6 mb-6"> {/* Added margin-bottom to each row */}
+        {/* Name Input */}
+        <input
+          type="text"
+          placeholder={`Enter Name ${index + 1}`}
+          value={member.name}
+          onChange={(e) => handleTeamMemberChange(index, "name", e.target.value)}
+          className="p-3 border border-gray-300 space-y-6 rounded-md w-full"
+        />
+        {/* Role Dropdown */}
+        <Select
+          value={{ value: member.role, label: member.role }}
+          onChange={(selectedOption) => handleTeamMemberChange(index, "role", selectedOption?.value || "")}
+          options={roleOptions}  // 🚨 Potential issue here!
+          className="w-40 space-y-6"
+        />
+      </div>
+    ))}
+  </div>
+  {/* Add Team Member Button */}
+  <button
+    type= "button"
+    onClick={addTeamMember}
+    className= "btn-primary"
+  >
+    Add Team Member
+  </button>
+</div>
+
+{/* Project Goals */}
+<div className="form-group">
+  <label htmlFor="goals" className="block text-sm font-medium">Project Goals (one per line)</label>
+  <textarea
+    id="goals"
+    value={goals}
+    onChange={(e) => setGoals(e.target.value)}
+    placeholder="Create a functional MVP 
+
 Implement user authentication
 Deploy to production"
-            required
-            className="w-full p-3 mt-1 border border-gray-300 rounded-md"
-          />
-        </div>
+    required
+    className="w-full p-3 mt-1 border border-gray-300 rounded-md"
+  />
+</div>
 
-        <button type="submit" className="btn-primary">
-          Save Project Brief
-        </button>
-      </form>
-    </div>
-  );
+<button type="submit" className="btn-primary">
+  Save Project Brief
+</button>
+</form>
+</div>
+);
 };
 
 export default ProjectBriefForm;

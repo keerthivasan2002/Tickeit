@@ -7,6 +7,7 @@ export interface TeamMember {
 }
 
 export interface Task {
+  assignedUser: string;
   id: string;
   title: string;
   description: string;
@@ -23,6 +24,8 @@ export interface ProjectBrief {
   teamMembers: TeamMember[];
   goals: string[];
 }
+
+
 
 export interface MeetingNote {
   id: string;
