@@ -1,28 +1,83 @@
 // src/components/ProjectList.tsx
-import React from 'react';
-
+import React, { useEffect, useState } from "react";
+import { dataStore } from "../data/data"; // Fixed import path
+import { ProjectBrief } from "../models/interfaces";
 
 interface ProjectListProps {
-  onSelectProject: () => void;
+  onSelectProject: (projectId: string) => void;
 }
 
-const dummyProjects = [
-  { id: 1, name: 'Project Alpha', description: 'This is a test project for demonstration purposes.' },
-  { id: 2, name: 'Project Beta', description: 'Another dummy project to showcase functionality.' },
-  { id: 3, name: 'Project Gamma', description: 'A sample project to help with testing.' },
-  // Add more dummy projects as needed
-];
-
 const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
+  const [projects, setProjects] = useState<{ id: string; brief: ProjectBrief }[]>([]);
+
+  const refreshProjects = () => {
+    const allProjects = dataStore.getAllProjects();
+    setProjects(allProjects);
+  };
+
+  useEffect(() => {
+    // Initial fetch of projects
+    refreshProjects();
+
+    // Set up event listeners to refresh when tab becomes visible or window gains focus
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshProjects();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', refreshProjects);
+
+    // Clean up event listeners on component unmount
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', refreshProjects);
+    };
+  }, []);
+
+  const handleSelectProject = (projectId: string) => {
+    dataStore.setCurrentProject(projectId);
+    onSelectProject(projectId);
+  };
+
+  const handleDeleteProject = (e: React.MouseEvent, projectId: string) => {
+    e.stopPropagation(); // Prevent triggering the parent onClick
+    if (dataStore.deleteProject(projectId)) {
+      refreshProjects();
+    }
+  };
+
+  if (projects.length === 0) {
+    return (
+      <div className="empty-projects">
+        <p>You don't have any projects yet. Create one to get started!</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="project-list">
-      <h3>Existing Projects:</h3>
-      {dummyProjects.map(project => (
-        <div key={project.id} className="project-item">
-          <h4>{project.name}</h4>
-          <p>{project.description}</p>
-          <button className="btn-secondary" onClick={onSelectProject}>
-            Select Project
+    <div className="projects-grid">
+      {projects.map((project) => (
+        <div
+          key={project.id}
+          className="project-card"
+          onClick={() => handleSelectProject(project.id)}
+        >
+          <h3>{project.brief.title}</h3>
+          <p>{project.brief.description.substring(0, 100)}...</p>
+          <div className="tech-stack">
+            {project.brief.techStack.map((tech, index) => (
+              <span key={index} className="tech-tag">
+                {tech}
+              </span>
+            ))}
+          </div>
+          <button
+            className="btn-delete"
+            onClick={(e) => handleDeleteProject(e, project.id)}
+          >
+            Delete
           </button>
         </div>
       ))}
