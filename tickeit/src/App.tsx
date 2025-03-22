@@ -26,10 +26,10 @@ const App: React.FC = () => {
                 className="btn-primary"
                 onClick={() => setSetupComplete(true)}
               >
-                Continue to RoleMind AI
+                Continue 
               </button>
             </div>
-          ) : (
+          ) : ( //divider
             <>
               <div className="left-panel">
                 <MeetingNotesInput />
@@ -45,7 +45,7 @@ const App: React.FC = () => {
         </main>
 
         <footer className="app-footer">
-          <p>RoleMind AI - Built for Hackathon 2025</p>
+          <p>Team Ticke - iNTUition 2025</p>
         </footer>
       </div>
     </ProjectProvider>
