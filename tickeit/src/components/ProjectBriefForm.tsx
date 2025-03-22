@@ -2,12 +2,6 @@ import React, { useState } from "react";
 import { useProject } from "../contexts/ProjectContext";
 import Select from "react-select";
 
-// Types for Team Member
-interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-}
 
 // Combine availableTechStacks with your current tech stack options
 const availableTechStacks = [
@@ -30,17 +24,19 @@ const availableTechStacks = [
   "Kubernetes"
 ];
 
+const roleOptions = [
+  { value: "frontend", label: "frontend" },
+  { value: "backend", label: "backend" },
+  { value: "ai", label: "ai" },
+  { value: "pm", label: "pm" },
+  { value: "designer", label: "designer" },
+];
+
+
 const techOptions = availableTechStacks.map((tech) => ({
   value: tech,
   label: tech
 }));
-
-const roleOptions = [
-  { value: "frontend", label: "frontend" },
-  { value: "backend", label: "backend" },
-  { value: "pm", label: "pm" },
-  { value: "scrum master", label: "scrum master" },
-];
 
 const ProjectBriefForm: React.FC = () => {
   const { setProjectBrief } = useProject();
@@ -71,7 +67,13 @@ const ProjectBriefForm: React.FC = () => {
   // Update Team Member
   const handleTeamMemberChange = (index: number, field: keyof TeamMember, value: string) => {
     const updatedMembers = [...teamMembers];
-    updatedMembers[index][field] = value;
+  
+    if (field === "role") {
+      updatedMembers[index][field] = value as Role; // Cast to Role
+    } else {
+      updatedMembers[index][field] = value;
+    }
+  
     setTeamMembers(updatedMembers);
   };
 
@@ -146,7 +148,7 @@ const ProjectBriefForm: React.FC = () => {
                 <Select
                   value={{ value: member.role, label: member.role }}
                   onChange={(selectedOption) => handleTeamMemberChange(index, "role", selectedOption?.value || "")}
-                  options={roleOptions}
+                  options={roleOptions}  // 🚨 Potential issue here!
                   className="w-40 space-y-6"
                 />
               </div>

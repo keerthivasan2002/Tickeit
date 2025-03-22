@@ -1,10 +1,10 @@
+export type Role = "frontend" | "backend" | "ai" | "pm" | "designer";
+
 export interface TeamMember {
   id: string;
   name: string;
   role: Role;
 }
-
-export type Role = "frontend" | "backend" | "ai" | "pm" | "designer";
 
 export interface Task {
   id: string;
