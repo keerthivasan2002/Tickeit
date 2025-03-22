@@ -4,7 +4,6 @@ import { useProject } from "../contexts/ProjectContext";
 import Select from "react-select";
 import { Role } from "../models/interfaces";
 import { dataStore } from "../data/data";
-import axios from 'axios'; // Import axios for API requests
 
 const availableTechStacks = [
   "React",
@@ -27,9 +26,7 @@ const availableTechStacks = [
   "Kubernetes"
 ];
 
-
-const roleOptions = [
-
+const roleOptions: { value: Role; label: Role }[] = [
   { value: "frontend", label: "frontend" },
   { value: "backend", label: "backend" },
 ];
@@ -39,18 +36,18 @@ const techOptions = availableTechStacks.map((tech) => ({
   label: tech
 }));
 
-
-type Role = "frontend" | "backend";
-
 interface TeamMember {
   id: string;
   name: string;
   role: Role;
 }
 
+interface ProjectBriefFormProps {
+  onComplete?: () => void;
+}
 
-const ProjectBriefForm: React.FC = () => {
-  const { setProjectBrief } = useProject();  // This might be used if you're storing the brief in a context
+const ProjectBriefForm: React.FC<ProjectBriefFormProps> = ({ onComplete }) => {
+  const { setProjectBrief } = useProject();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [techStack, setTechStack] = useState<any[]>([]);
@@ -63,7 +60,7 @@ const ProjectBriefForm: React.FC = () => {
     setTechStack(selectedOptions ? selectedOptions.map((option: any) => option.value) : []);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const goalsArray = goals.split("\n").filter((goal) => goal.trim() !== "");
     const projectBrief = {
@@ -79,52 +76,21 @@ const ProjectBriefForm: React.FC = () => {
     
     // No need to call setProjectBrief as createProject already sets the current project
     
-    // Convert goals to an array (splitting by newline) and filter empty lines
-    const goalsArray = goals.split("\n").filter((goal) => goal.trim() !== "");
-    
-    try {
-      // Send the project data to the backend
-      await axios.post('http://localhost:5001/api/project-brief', {
-        title,
-        description,
-        techStack,
-        teamMembers,
-        goals: goalsArray,
-      });
-
-      // Optionally, clear the form after submission
-      setTitle('');
-      setDescription('');
-      setTechStack([]);
-      setTeamMembers([{ id: "member-1", name: "", role: "frontend" as Role }]);
-      setGoals('');
-
-      // If you're saving to a context (like `useProject`), update it here:
-      setProjectBrief({
-        title,
-        description,
-        techStack,
-        teamMembers,
-        goals: goalsArray,
-      });
-
-      // Optionally, you can add feedback or other actions after the submission is successful
-      alert("Project Brief saved successfully!");
-
-    } catch (error) {
-      console.error("Error submitting project brief:", error);
-
+    if (onComplete) {
+      onComplete();
     }
   };
 
   // Update Team Member
   const handleTeamMemberChange = (index: number, field: keyof TeamMember, value: string) => {
     const updatedMembers = [...teamMembers];
+  
     if (field === "role") {
-      updatedMembers[index][field] = value as Role;  // Cast to Role
+      updatedMembers[index][field] = value as Role; // Cast to Role
     } else {
       updatedMembers[index][field] = value;
     }
+  
     setTeamMembers(updatedMembers);
   };
 
@@ -200,7 +166,6 @@ const ProjectBriefForm: React.FC = () => {
                   value={{ value: member.role, label: member.role }}
                   onChange={(selectedOption) => handleTeamMemberChange(index, "role", selectedOption?.value || "")}
                   options={roleOptions}
-
                   className="w-40 space-y-6"
                 />
               </div>
@@ -231,7 +196,6 @@ Deploy to production"
             className="w-full p-3 mt-1 border border-gray-300 rounded-md"
           />
         </div>
-
 
         <button type="submit" className="btn-primary">
           Save Project Brief
