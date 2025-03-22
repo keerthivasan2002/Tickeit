@@ -46,12 +46,6 @@ interface TeamMember {
 }
 
 
-
-const techOptions = availableTechStacks.map((tech) => ({
-  value: tech,
-  label: tech
-}));
-
 const ProjectBriefForm: React.FC = () => {
   const { setProjectBrief } = useProject();
   const [title, setTitle] = useState("");
