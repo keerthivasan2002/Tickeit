@@ -1,51 +1,62 @@
-// src/components/ProjectList.tsx
-import React, { useEffect, useState } from "react";
-import { dataStore } from "../data/data"; // Fixed import path
-import { ProjectBrief } from "../models/interfaces";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 interface ProjectListProps {
-  onSelectProject: (projectId: string) => void;
+  onSelectProject: (projectId: string) => void; // Pass projectId to onSelectProject function
+}
+
+interface ProjectBrief {
+  title: string;
+  description: string;
+  techStack: string[];
+  goals: string[];
+}
+
+interface Project {
+  id: string; // This should be string since you're using `string` in the original code
+  brief: ProjectBrief;
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
-  const [projects, setProjects] = useState<{ id: string; brief: ProjectBrief }[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  const refreshProjects = () => {
-    const allProjects = dataStore.getAllProjects();
-    setProjects(allProjects);
-  };
-
+  // Fetch projects from the backend when the component mounts
   useEffect(() => {
-    // Initial fetch of projects
-    refreshProjects();
-
-    // Set up event listeners to refresh when tab becomes visible or window gains focus
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        refreshProjects();
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/project-brief');
+        setProjects(response.data.data); // Assuming the data comes in the 'data' property
+      } catch (error) {
+        console.error('Error fetching projects:', error);
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', refreshProjects);
-
-    // Clean up event listeners on component unmount
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', refreshProjects);
-    };
-  }, []);
+    fetchProjects();
+  }, []); // Empty dependency array ensures this runs once when the component mounts
 
   const handleSelectProject = (projectId: string) => {
-    dataStore.setCurrentProject(projectId);
     onSelectProject(projectId);
   };
 
   const handleDeleteProject = (e: React.MouseEvent, projectId: string) => {
     e.stopPropagation(); // Prevent triggering the parent onClick
-    if (dataStore.deleteProject(projectId)) {
-      refreshProjects();
-    }
+    // Assuming you have a delete method for the backend; make an API call here if needed
+    axios.delete(`http://localhost:5001/api/project-brief/${projectId}`)
+      .then(() => {
+        // Re-fetch the projects after deleting
+        const fetchProjects = async () => {
+          try {
+            const response = await axios.get('http://localhost:5001/api/project-brief');
+            setProjects(response.data.data);
+          } catch (error) {
+            console.error('Error fetching projects:', error);
+          }
+        };
+        fetchProjects();
+      })
+      .catch((error) => {
+        console.error('Error deleting project:', error);
+      });
   };
 
   if (projects.length === 0) {
