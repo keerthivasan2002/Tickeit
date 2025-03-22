@@ -2,12 +2,13 @@
 import React, { useState } from "react";
 import { ProjectProvider } from "./contexts/ProjectContext";
 import AppHeader from "./components/AppHeader";
-import ProjectList from "./components/ProjectList"; // New component
+import ProjectList from "./components/ProjectList";
 import ProjectBriefForm from "./components/ProjectBriefForm";
 import MeetingNotesInput from "./components/MeetingNotesInput";
 import RoleSelector from "./components/RoleSelector";
 import TaskList from "./components/TaskList";
 import AIStandupChat from "./components/AIStandupChat";
+import ChosenStacks from "./components/ChosenStacks"; // Import the ChosenStacks component
 import "./App.css";
 
 const App: React.FC = () => {
@@ -57,6 +58,7 @@ const App: React.FC = () => {
             </button>
 
             <div className="left-panel">
+              <ChosenStacks /> {/* Add ChosenStacks component here */}
               <MeetingNotesInput />
               <AIStandupChat />
             </div>

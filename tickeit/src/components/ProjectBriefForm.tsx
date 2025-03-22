@@ -8,6 +8,7 @@ const availableTechStacks = [
   "React",
   "TypeScript",
   "JavaScript",
+  "Java",
   "Node.js",
   "Express",
   "MongoDB",
