@@ -28,6 +28,15 @@ const App: React.FC = () => {
       case 'projectBrief':
         return (
           <div className="setup-container">
+            {/* Back Button */}
+            <button 
+              className="btn-back"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '0.5rem', marginBottom: '1rem' }}
+              onClick={() => setCurrentPage('projectList')}
+            >
+              &larr; Back to Projects
+            </button>
+            
             <h2>Set Up Your Project</h2>
             <ProjectBriefForm />
             <button className="btn-primary" onClick={() => setCurrentPage('main')}>
@@ -38,6 +47,15 @@ const App: React.FC = () => {
       case 'main':
         return (
           <>
+            {/* Back Button */}
+            <button 
+              className="btn-back"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '0.5rem', marginBottom: '1rem' }}
+              onClick={() => setCurrentPage('projectList')}
+            >
+              &larr; Back to Projects
+            </button>
+
             <div className="left-panel">
               <MeetingNotesInput />
               <AIStandupChat />
