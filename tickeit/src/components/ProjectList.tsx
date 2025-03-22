@@ -4,7 +4,19 @@ import { dataStore } from "../data/data";
 import { ProjectBrief } from "../models/interfaces";
 
 interface ProjectListProps {
-  onSelectProject: (projectId: string) => void;
+  onSelectProject: (projectId: string) => void; // Pass projectId to onSelectProject function
+}
+
+interface ProjectBrief {
+  title: string;
+  description: string;
+  techStack: string[];
+  goals: string[];
+}
+
+interface Project {
+  id: string; // This should be string since you're using `string` in the original code
+  brief: ProjectBrief;
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
@@ -21,7 +33,6 @@ const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
   };
 
   const handleSelectProject = (projectId: string) => {
-    dataStore.setCurrentProject(projectId);
     onSelectProject(projectId);
   };
 
