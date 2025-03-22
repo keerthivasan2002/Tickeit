@@ -9,6 +9,9 @@ import TaskList from "./components/TaskList";
 import AIStandupChat from "./components/AIStandupChat";
 import "./App.css";
 
+// 🚧 TEMP: Import test component
+import CreateProjectTest from "./components/createProjectTest";
+
 const App: React.FC = () => {
   const [setupComplete, setSetupComplete] = useState(false);
 
@@ -22,6 +25,10 @@ const App: React.FC = () => {
             <div className="setup-container">
               <h2>Set Up Your Project</h2>
               <ProjectBriefForm />
+
+              {/* 🚧 Test Project Creation */}
+              <CreateProjectTest />
+
               <button
                 className="btn-primary"
                 onClick={() => setSetupComplete(true)}

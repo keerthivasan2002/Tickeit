@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "appwrite": "^17.0.1",
     "react": "^19.0.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
