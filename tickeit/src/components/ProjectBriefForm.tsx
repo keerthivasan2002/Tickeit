@@ -25,6 +25,7 @@ const availableTechStacks = [
   "Kubernetes"
 ];
 
+
 const roleOptions: { value: Role; label: Role }[] = [
   { value: "frontend", label: "frontend" },
   { value: "backend", label: "backend" },
@@ -43,6 +44,13 @@ interface TeamMember {
   name: string;
   role: Role;
 }
+
+
+
+const techOptions = availableTechStacks.map((tech) => ({
+  value: tech,
+  label: tech
+}));
 
 const ProjectBriefForm: React.FC = () => {
   const { setProjectBrief } = useProject();
@@ -135,6 +143,7 @@ const ProjectBriefForm: React.FC = () => {
           />
         </div>
 
+
 {/* Team Member Inputs */}
 <div className="mb-4">
   <label htmlFor="teamMembers" className="block text-sm font-medium">Add Team Members (Name and Role)</label>
@@ -178,6 +187,7 @@ const ProjectBriefForm: React.FC = () => {
     value={goals}
     onChange={(e) => setGoals(e.target.value)}
     placeholder="Create a functional MVP 
+
 Implement user authentication
 Deploy to production"
     required
