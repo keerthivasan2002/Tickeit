@@ -1,6 +1,6 @@
 // src/components/ProjectList.tsx
 import React, { useEffect, useState } from "react";
-import { dataStore } from "../data/data"; // Fixed import path
+import { dataStore } from "../data/data";
 import { ProjectBrief } from "../models/interfaces";
 
 interface ProjectListProps {
@@ -10,31 +10,15 @@ interface ProjectListProps {
 const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
   const [projects, setProjects] = useState<{ id: string; brief: ProjectBrief }[]>([]);
 
+  useEffect(() => {
+    // Fetch projects only once when the component mounts
+    refreshProjects();
+  }, []);
+
   const refreshProjects = () => {
     const allProjects = dataStore.getAllProjects();
     setProjects(allProjects);
   };
-
-  useEffect(() => {
-    // Initial fetch of projects
-    refreshProjects();
-
-    // Set up event listeners to refresh when tab becomes visible or window gains focus
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        refreshProjects();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', refreshProjects);
-
-    // Clean up event listeners on component unmount
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', refreshProjects);
-    };
-  }, []);
 
   const handleSelectProject = (projectId: string) => {
     dataStore.setCurrentProject(projectId);
@@ -42,7 +26,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
   };
 
   const handleDeleteProject = (e: React.MouseEvent, projectId: string) => {
-    e.stopPropagation(); // Prevent triggering the parent onClick
+    e.stopPropagation();
     if (dataStore.deleteProject(projectId)) {
       refreshProjects();
     }

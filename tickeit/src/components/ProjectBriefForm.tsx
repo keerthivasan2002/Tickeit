@@ -5,7 +5,6 @@ import Select from "react-select";
 import { Role } from "../models/interfaces";
 import { dataStore } from "../data/data";
 
-// Combine availableTechStacks with your current tech stack options
 const availableTechStacks = [
   "React",
   "TypeScript",
@@ -72,9 +71,10 @@ const ProjectBriefForm: React.FC<ProjectBriefFormProps> = ({ onComplete }) => {
       goals: goalsArray,
     };
 
-    setProjectBrief(projectBrief);
-
-    dataStore.createProject(projectBrief);
+    // Create a new project and set it as the current project
+    const projectId = dataStore.createProject(projectBrief);
+    
+    // No need to call setProjectBrief as createProject already sets the current project
     
     if (onComplete) {
       onComplete();
@@ -152,7 +152,7 @@ const ProjectBriefForm: React.FC<ProjectBriefFormProps> = ({ onComplete }) => {
           <div className="space-y-20">
             {/* Loop through the team members */}
             {teamMembers.map((member, index) => (
-              <div key={index} className="flex space-y-6 mb-6"> {/* Added margin-bottom to each row */}
+              <div key={index} className="flex space-y-6 mb-6">
                 {/* Name Input */}
                 <input
                   type="text"
@@ -183,7 +183,7 @@ const ProjectBriefForm: React.FC<ProjectBriefFormProps> = ({ onComplete }) => {
 
         {/* Project Goals */}
         <div className="form-group">
-          <label htmlFor="goals" className="block text-sm font-medium">Project Goals (one per line)</label>
+          <label htmlFor="goals" className="block text-sm font-medium">Project Goals </label>
           <textarea
             id="goals"
             value={goals}

@@ -1,4 +1,4 @@
-// src/services/dataStore.ts
+
 import { ProjectBrief, MeetingNote, Task, Role } from "../models/interfaces";
 
 interface ProjectData {
@@ -53,7 +53,6 @@ class DataStore {
     return false;
   }
 
-  // Project brief methods
   getProjectBrief(): ProjectBrief | null {
     const project = this.getCurrentProject();
     return project ? project.brief : null;
@@ -63,12 +62,9 @@ class DataStore {
     const project = this.getCurrentProject();
     if (project) {
       project.brief = brief;
-    } else {
-      this.createProject(brief);
     }
   }
 
-  // Meeting notes methods
   getMeetingNotes(): MeetingNote[] {
     const project = this.getCurrentProject();
     return project ? project.meetingNotes : [];
@@ -81,7 +77,6 @@ class DataStore {
     }
   }
 
-  // Tasks methods
   getTasks(): Task[] {
     const project = this.getCurrentProject();
     return project ? project.tasks : [];
@@ -110,7 +105,6 @@ class DataStore {
     }
   }
 
-  // Role methods
   getSelectedRole(): Role | null {
     const project = this.getCurrentProject();
     return project ? project.selectedRole : null;
@@ -123,17 +117,14 @@ class DataStore {
     }
   }
 
-  // Method to reset the store (useful for testing or clearing data)
   resetStore(): void {
     this.projects.clear();
     this.currentProjectId = null;
   }
 
-  // Check if the store has been initialized
   isInitialized(): boolean {
     return this.projects.size > 0;
   }
 }
 
-// Export a singleton instance
 export const dataStore = new DataStore();
