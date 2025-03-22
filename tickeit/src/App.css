@@ -102,6 +102,8 @@ select {
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin-top: 1rem; /* Adds space above the button */
+  margin-bottom: 1rem; /* Adds space below the button */
 }
 
 .btn-primary:hover {
