@@ -1,6 +1,6 @@
 # Tickeit - AI-Powered Project Management
 
-Tickeit is an AI-powered project management tool that helps teams manage tasks, meeting notes, and project briefs efficiently. This project uses React, TypeScript, Vite, and various other technologies to provide a seamless experience.
+Tickeit is an AI-powered project management tool that helps teams manage tasks, meeting notes, and project briefs efficiently. This project uses React, TypeScript, Vite, and Google Gemini to provide a seamless experience.
 
 ## Features
 
@@ -15,10 +15,6 @@ Tickeit is an AI-powered project management tool that helps teams manage tasks, 
 - React
 - TypeScript
 - Vite
-- Appwrite
-- Tailwind CSS
-- Express
-- SQLite
 - Google Gemini API
 
 ## Getting Started
