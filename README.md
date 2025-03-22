@@ -57,7 +57,11 @@ Tickeit is an AI-powered project management tool that helps teams manage tasks, 
 
 ### Running the Project
 
-   ```npm run dev```
+  Start the server:
+
+   ```sh
+   npm run dev
+   ```
 
 ## License
 
