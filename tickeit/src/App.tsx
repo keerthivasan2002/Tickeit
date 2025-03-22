@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { ProjectProvider } from "./contexts/ProjectContext";
 import AppHeader from "./components/AppHeader";
+import ProjectList from "./components/ProjectList"; // New component
 import ProjectBriefForm from "./components/ProjectBriefForm";
 import MeetingNotesInput from "./components/MeetingNotesInput";
 import RoleSelector from "./components/RoleSelector";
@@ -9,48 +10,54 @@ import TaskList from "./components/TaskList";
 import AIStandupChat from "./components/AIStandupChat";
 import "./App.css";
 
-// 🚧 TEMP: Import test component
-import CreateProjectTest from "./components/createProjectTest";
-
 const App: React.FC = () => {
-  const [setupComplete, setSetupComplete] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'projectList' | 'projectBrief' | 'main'>('projectList');
+  
+  const renderContent = () => {
+    switch (currentPage) {
+      case 'projectList':
+        return (
+          <div className="project-list-container">
+            <h2>Your Projects</h2>
+            <ProjectList onSelectProject={() => setCurrentPage('main')} />
+            <button className="btn-primary" onClick={() => setCurrentPage('projectBrief')}>
+              Create New Project
+            </button>
+          </div>
+        );
+      case 'projectBrief':
+        return (
+          <div className="setup-container">
+            <h2>Set Up Your Project</h2>
+            <ProjectBriefForm />
+            <button className="btn-primary" onClick={() => setCurrentPage('main')}>
+              Continue
+            </button>
+          </div>
+        );
+      case 'main':
+        return (
+          <>
+            <div className="left-panel">
+              <MeetingNotesInput />
+              <AIStandupChat />
+            </div>
+            <div className="right-panel">
+              <RoleSelector />
+              <TaskList />
+            </div>
+          </>
+        );
+    }
+  };
 
   return (
     <ProjectProvider>
       <div className="app-container">
         <AppHeader />
-
         <main className="app-content">
-          {!setupComplete ? (
-            <div className="setup-container">
-              <h2>Set Up Your Project</h2>
-              <ProjectBriefForm />
-
-              {/* 🚧 Test Project Creation */}
-              <CreateProjectTest />
-
-              <button
-                className="btn-primary"
-                onClick={() => setSetupComplete(true)}
-              >
-                Continue 
-              </button>
-            </div>
-          ) : ( //divider
-            <>
-              <div className="left-panel">
-                <MeetingNotesInput />
-                <AIStandupChat />
-              </div>
-
-              <div className="right-panel">
-                <RoleSelector />
-                <TaskList />
-              </div>
-            </>
-          )}
+          {renderContent()}
         </main>
-
         <footer className="app-footer">
           <p>Team Ticke - iNTUition 2025</p>
         </footer>

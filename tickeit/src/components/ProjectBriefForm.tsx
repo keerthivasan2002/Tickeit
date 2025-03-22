@@ -2,12 +2,6 @@ import React, { useState } from "react";
 import { useProject } from "../contexts/ProjectContext";
 import Select from "react-select";
 
-// Types for Team Member
-interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-}
 
 // Combine availableTechStacks with your current tech stack options
 const availableTechStacks = [
@@ -30,17 +24,24 @@ const availableTechStacks = [
   "Kubernetes"
 ];
 
+const roleOptions: { value: Role; label: Role }[] = [
+  { value: "frontend", label: "frontend" },
+  { value: "backend", label: "backend" },
+];
+
+
 const techOptions = availableTechStacks.map((tech) => ({
   value: tech,
   label: tech
 }));
 
-const roleOptions = [
-  { value: "frontend", label: "frontend" },
-  { value: "backend", label: "backend" },
-  { value: "pm", label: "pm" },
-  { value: "scrum master", label: "scrum master" },
-];
+type Role = "frontend" | "backend" 
+
+interface TeamMember {
+  id: string;
+  name: string;
+  role: Role;
+}
 
 const ProjectBriefForm: React.FC = () => {
   const { setProjectBrief } = useProject();
@@ -48,7 +49,7 @@ const ProjectBriefForm: React.FC = () => {
   const [description, setDescription] = useState("");
   const [techStack, setTechStack] = useState<any[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { id: "member-1", name: "", role: "" },
+    { id: "member-1", name: "", role: "frontend" as Role },
   ]);
   const [goals, setGoals] = useState("");
 
@@ -71,7 +72,13 @@ const ProjectBriefForm: React.FC = () => {
   // Update Team Member
   const handleTeamMemberChange = (index: number, field: keyof TeamMember, value: string) => {
     const updatedMembers = [...teamMembers];
-    updatedMembers[index][field] = value;
+  
+    if (field === "role") {
+      updatedMembers[index][field] = value as Role; // Cast to Role
+    } else {
+      updatedMembers[index][field] = value;
+    }
+  
     setTeamMembers(updatedMembers);
   };
 
@@ -79,7 +86,7 @@ const ProjectBriefForm: React.FC = () => {
   const addTeamMember = () => {
     setTeamMembers([
       ...teamMembers,
-      { id: `member-${teamMembers.length + 1}`, name: "", role: "" },
+      { id: `member-${teamMembers.length + 1}`, name: "", role: "frontend" as Role },
     ]);
   };
 
@@ -127,62 +134,62 @@ const ProjectBriefForm: React.FC = () => {
           />
         </div>
 
-        {/* Team Member Inputs */}
-        <div className="mb-4">
-          <label htmlFor="teamMembers" className="block text-sm font-medium">Add Team Members (Name and Role)</label>
-          <div className="space-y-20">
-            {/* Loop through the team members */}
-            {teamMembers.map((member, index) => (
-              <div key={index} className="flex space-y-6 mb-6"> {/* Added margin-bottom to each row */}
-                {/* Name Input */}
-                <input
-                  type="text"
-                  placeholder={`Enter Name ${index + 1}`}
-                  value={member.name}
-                  onChange={(e) => handleTeamMemberChange(index, "name", e.target.value)}
-                  className="p-3 border border-gray-300 space-y-6 rounded-md w-full"
-                />
-                {/* Role Dropdown */}
-                <Select
-                  value={{ value: member.role, label: member.role }}
-                  onChange={(selectedOption) => handleTeamMemberChange(index, "role", selectedOption?.value || "")}
-                  options={roleOptions}
-                  className="w-40 space-y-6"
-                />
-              </div>
-            ))}
-          </div>
-          {/* Add Team Member Button */}
-          <button
-            type= "button"
-            onClick={addTeamMember}
-            className= "btn-primary"
-          >
-            Add Team Member
-          </button>
-        </div>
+{/* Team Member Inputs */}
+<div className="mb-4">
+  <label htmlFor="teamMembers" className="block text-sm font-medium">Add Team Members (Name and Role)</label>
+  <div className="space-y-20">
+    {/* Loop through the team members */}
+    {teamMembers.map((member, index) => (
+      <div key={index} className="flex space-y-6 mb-6"> {/* Added margin-bottom to each row */}
+        {/* Name Input */}
+        <input
+          type="text"
+          placeholder={`Enter Name ${index + 1}`}
+          value={member.name}
+          onChange={(e) => handleTeamMemberChange(index, "name", e.target.value)}
+          className="p-3 border border-gray-300 space-y-6 rounded-md w-full"
+        />
+        {/* Role Dropdown */}
+        <Select
+          value={{ value: member.role, label: member.role }}
+          onChange={(selectedOption) => handleTeamMemberChange(index, "role", selectedOption?.value || "")}
+          options={roleOptions}  // 🚨 Potential issue here!
+          className="w-40 space-y-6"
+        />
+      </div>
+    ))}
+  </div>
+  {/* Add Team Member Button */}
+  <button
+    type= "button"
+    onClick={addTeamMember}
+    className= "btn-primary"
+  >
+    Add Team Member
+  </button>
+</div>
 
-        {/* Project Goals */}
-        <div className="form-group">
-          <label htmlFor="goals" className="block text-sm font-medium">Project Goals (one per line)</label>
-          <textarea
-            id="goals"
-            value={goals}
-            onChange={(e) => setGoals(e.target.value)}
-            placeholder="Create a functional MVP 
+{/* Project Goals */}
+<div className="form-group">
+  <label htmlFor="goals" className="block text-sm font-medium">Project Goals (one per line)</label>
+  <textarea
+    id="goals"
+    value={goals}
+    onChange={(e) => setGoals(e.target.value)}
+    placeholder="Create a functional MVP 
 Implement user authentication
 Deploy to production"
-            required
-            className="w-full p-3 mt-1 border border-gray-300 rounded-md"
-          />
-        </div>
+    required
+    className="w-full p-3 mt-1 border border-gray-300 rounded-md"
+  />
+</div>
 
-        <button type="submit" className="btn-primary">
-          Save Project Brief
-        </button>
-      </form>
-    </div>
-  );
+<button type="submit" className="btn-primary">
+  Save Project Brief
+</button>
+</form>
+</div>
+);
 };
 
 export default ProjectBriefForm;
