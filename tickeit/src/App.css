@@ -91,7 +91,6 @@ select {
   font-size: 1rem;
   margin-bottom: 0.2rem;
   margin-top: 1rem;
-  
 }
 
 .btn-primary {
@@ -276,13 +275,11 @@ select {
 }
 
 .tech-tag {
-  display: inline-block;
   background-color: var(--secondary-color);
   color: white;
   font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  margin-right: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.375rem;
 }
 
 .setup-container {
@@ -306,19 +303,19 @@ select {
   .project-list {
     padding: 20px;
   }
-  
+
   .project-item {
     background-color: #f0f0f0;
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   }
-  
+
   .project-item h4 {
     margin-top: 0;
   }
-  
+
   .project-item button {
     margin-top: 10px;
   }
@@ -385,15 +382,74 @@ select {
     gap: 10px;
     margin-top: 10px;
   }
-  
+
   .task-actions select {
     padding: 5px;
     border-radius: 4px;
     border: 1px solid #ccc;
   }
-  
+
   .user-assignment-select {
     min-width: 150px;
   }
-  
+}
+.btn-delete {
+  background-color: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  align-self: flex-end;
+  margin-top: 1rem;
+}
+.btn-delete:hover {
+  background-color: #dc2626;
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.project-card {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary-color);
+}
+
+.project-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.project-card p {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
 }

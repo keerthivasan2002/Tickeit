@@ -8,7 +8,9 @@ interface ProjectListProps {
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
-  const [projects, setProjects] = useState<{ id: string; brief: ProjectBrief }[]>([]);
+  const [projects, setProjects] = useState<
+    { id: string; brief: ProjectBrief }[]
+  >([]);
 
   useEffect(() => {
     // Fetch projects only once when the component mounts
@@ -49,7 +51,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onSelectProject }) => {
           onClick={() => handleSelectProject(project.id)}
         >
           <h3>{project.brief.title}</h3>
-          <p>{project.brief.description.substring(0, 100)}...</p>
+          <p>{project.brief.description.substring(0, 300)}...</p>
           <div className="tech-stack">
             {project.brief.techStack.map((tech, index) => (
               <span key={index} className="tech-tag">

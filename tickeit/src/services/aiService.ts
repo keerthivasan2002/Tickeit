@@ -5,13 +5,18 @@ import { dataStore } from "../data/data";
 
 // Configuration
 const GEMINI_API_KEY = "AIzaSyCbop97JqeAtmaQzIVzANnoZDrOMhhexQc";
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent";
+const GEMINI_API_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
 
 // Custom error class
 class GeminiAPIError extends Error {
-  constructor(message: string, public statusCode?: number, public response?: any) {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public response?: any
+  ) {
     super(message);
     this.name = "GeminiAPIError";
   }
@@ -30,12 +35,16 @@ async function callGeminiAPI(payload: any, retries = 0): Promise<any> {
       // Handle rate limiting
       if (error.response.status === 429 && retries < MAX_RETRIES) {
         console.warn(`Rate limited. Retrying in ${RETRY_DELAY_MS}ms...`);
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * (retries + 1)));
+        await new Promise((resolve) =>
+          setTimeout(resolve, RETRY_DELAY_MS * (retries + 1))
+        );
         return callGeminiAPI(payload, retries + 1);
       }
 
       throw new GeminiAPIError(
-        `Gemini API error: ${error.response.data.error?.message || 'Unknown error'}`,
+        `Gemini API error: ${
+          error.response.data.error?.message || "Unknown error"
+        }`,
         error.response.status,
         error.response.data
       );
@@ -69,7 +78,9 @@ Please return a JSON array of tasks with the following structure:
     "id": "unique-id",
     "title": "Task title",
     "description": "Detailed description",
-    "assignedRole": "One of: ${projectBrief.teamMembers.map(member => member.role).join(', ')}",
+    "assignedRole": "One of: ${projectBrief.teamMembers
+      .map((member) => member.role)
+      .join(", ")}",
     "status": "todo",
     "priority": "One of: high, medium, low",
     "createdAt": "ISO date string"
@@ -80,10 +91,8 @@ Please return a JSON array of tasks with the following structure:
     const payload = {
       contents: [
         {
-          parts: [
-            { text: prompt }
-          ]
-        }
+          parts: [{ text: prompt }],
+        },
       ],
       generationConfig: {
         temperature: 0.2,
@@ -99,12 +108,18 @@ Please return a JSON array of tasks with the following structure:
               assignedRole: { type: "STRING" },
               status: { type: "STRING" },
               priority: { type: "STRING" },
-              createdAt: { type: "STRING" }
+              createdAt: { type: "STRING" },
             },
-            required: ["title", "description", "assignedRole", "status", "priority"]
-          }
-        }
-      }
+            required: [
+              "title",
+              "description",
+              "assignedRole",
+              "status",
+              "priority",
+            ],
+          },
+        },
+      },
     };
 
     const data = await callGeminiAPI(payload);
@@ -115,9 +130,11 @@ Please return a JSON array of tasks with the following structure:
     // Ensure each task has a valid ID and createdAt timestamp
     return generatedTasks.map((task: any) => ({
       ...task,
-      id: task.id || `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id:
+        task.id ||
+        `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       createdAt: task.createdAt ? new Date(task.createdAt) : new Date(),
-      assignedUser: "" // Initialize with empty assignedUser
+      assignedUser: "", // Initialize with empty assignedUser
     }));
   } catch (error) {
     console.error("Error generating tasks:", error);
@@ -136,7 +153,7 @@ export async function getAIStandupResponse(
   meetingNotes: MeetingNote[]
 ): Promise<string> {
   try {
-    const roleTasks = tasks.filter(task => task.assignedRole === role);
+    const roleTasks = tasks.filter((task) => task.assignedRole === role);
 
     const prompt = `
 You are an AI assistant helping with a software development project.
@@ -155,22 +172,20 @@ Based on the above information, provide a concise standup response for a ${role}
 2. Which tasks are highest priority
 3. Any potential blockers they should be aware of
 4. Any team dependencies they should know about
-
+5. In your response, refer to the tasks by their title, not by their IDs.
 Keep the response under 200 words and make it actionable.
 `;
 
     const payload = {
       contents: [
         {
-          parts: [
-            { text: prompt }
-          ]
-        }
+          parts: [{ text: prompt }],
+        },
       ],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 300
-      }
+        maxOutputTokens: 300,
+      },
     };
 
     const data = await callGeminiAPI(payload);

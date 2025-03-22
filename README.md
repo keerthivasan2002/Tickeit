@@ -1,13 +1,79 @@
-# React + TypeScript + Vite
+# Tickeit - AI-Powered Project Management
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Tickeit is an AI-powered project management tool that helps teams manage tasks, meeting notes, and project briefs efficiently. This project uses React, TypeScript, Vite, and various other technologies to provide a seamless experience.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Create and manage project briefs
+- Add and manage team members
+- Generate tasks from meeting notes using AI
+- View tasks by role
+- AI stand-up chat for personalized guidance
 
-## Expanding the ESLint configuration
+## Technologies Used
+
+- React
+- TypeScript
+- Vite
+- Appwrite
+- Tailwind CSS
+- Express
+- SQLite
+- Google Gemini API
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/your-username/tickeit.git
+   cd tickeit
+   ```
+
+2. Install dependencies:
+
+   ```sh
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Set up environment variables:
+
+   Create a `.env` file in the root directory and add your Google Gemini API key:
+
+   ```env
+   VITE_GEMINI_API_KEY=your-google-gemini-api-key
+   ```
+
+   > **Disclaimer:** The API keys are not provided in this repository. You can apply for a free API key from Google to use in the code.
+
+### Running the Project
+
+1. Start the backend server:
+
+   ```sh
+   cd backend
+   npm start
+   ```
+
+2. Start the frontend development server:
+
+   ```sh
+   cd ..
+   npm run dev
+   ```
+
+3. Open your browser and navigate to `http://localhost:3000`.
+
+## Expanding the ESLint Configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
@@ -52,3 +118,7 @@ export default tseslint.config({
   },
 });
 ```
+
+## License
+
+This project is licensed under the MIT License.
