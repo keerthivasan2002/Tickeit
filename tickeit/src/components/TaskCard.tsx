@@ -8,12 +8,19 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
-  const { updateTask } = useProject();
+  const { updateTask, projectBrief } = useProject();
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateTask({
       ...task,
       status: e.target.value as any,
+    });
+  };
+
+  const handleUserAssignment = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateTask({
+      ...task,
+      assignedUser: e.target.value,
     });
   };
 
@@ -41,6 +48,23 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             <option value="todo">To Do</option>
             <option value="in-progress">In Progress</option>
             <option value="done">Done</option>
+          </select>
+          
+          <select 
+            value={task.assignedUser || ""} 
+            onChange={handleUserAssignment}
+            className="user-assignment-select"
+          >
+            <option value="">Assign User</option>
+            {/* Get team members from projectBrief */}
+            {projectBrief?.teamMembers
+              .filter(member => !task.assignedRole || member.role === task.assignedRole)
+              .map(member => (
+                <option key={member.id} value={member.id}>
+                  {member.name} ({member.role})
+                </option>
+              ))
+            }
           </select>
         </div>
       </div>

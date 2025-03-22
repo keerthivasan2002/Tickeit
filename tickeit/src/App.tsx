@@ -77,7 +77,7 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
         <footer className="app-footer">
-          <p>Team Ticke - iNTUition 2025</p>
+          <p>Team 45 - iNTUition 2025</p>
         </footer>
       </div>
     </ProjectProvider>
